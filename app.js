@@ -7,7 +7,11 @@ const app=express();
 const userRoutes=require('./routes/user')
 
 const userControllers=require('./controllers/user')
-app.use(cors())
+app.use(cors({
+    origin:'http://127.0.0.1:5501', //* for all
+    methods:['GET','POST','DELETE','PUT'],
+    credentials:true
+}))
 app.use(express.json())
 app.use('/user',userRoutes)
 userControllers.sync()

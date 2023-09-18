@@ -18,14 +18,14 @@ try{
     }else{
         const User=await user.findOne({where:{email:email}});
         if(User){
-            return res.status(200).json({message:'Email already exist',success:true})
+            return res.status(200).json({message:'* Email already exist please login!',success:true})
         }else{
             const saltrounds=10;
             bcrypt.hash(password,saltrounds,async(err,hash)=>{
                 if(hash){
                     await user.create({name,email,phone,password:hash},{transaction:t});
                     await t.commit();
-                    return res.status(201).json({message:'user signed up successfully',success:true})
+                    return res.status(201).json({message:'you have signed up successfully',success:true})
                 }else{
                     throw new Error('something went wrong');
                 }

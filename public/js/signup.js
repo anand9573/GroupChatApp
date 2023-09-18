@@ -14,7 +14,7 @@ async function senddata(e){
                 async function emailExist(){
                     const submit=document.getElementById('submit')
                     const h6=document.createElement('h6')
-                    h6.textContent+=" * Email already exist";
+                    h6.textContent+=res.data.message;
                     submit.before(h6);
                     h6.style.color="red";
                     await sleep(4000);
@@ -22,6 +22,7 @@ async function senddata(e){
                 }
                 emailExist()
             }else if(res.status===201){
+                alert(res.data.message)
                 window.location.href = "../../views/login.html";
             }
     }catch(err){
