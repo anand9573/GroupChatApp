@@ -1,6 +1,7 @@
 const sequelize=require('../util/database');
 const user=require('../model/user');
 const bcrypt=require('bcrypt');
+const jwt=require('jsonwebtoken');
 
 function isinvalid(string){
     if(string===undefined || string.length===0){
@@ -39,6 +40,36 @@ try{
         }
         res.status(500).json({error:err,success:false}) 
     }
+}
+
+function generateAccessToken(id,name){
+    return jwt.sign({userid:id,name},process.env.TOKEN_SECRET)
+}
+
+exports.login=async(req,res,next)=>{
+    try{
+    const {email,password}=req.body;
+    if(isinvalid(email) || isinvalid(password)){
+        return res.status(403).json({message:'user details are not valid fill all neccessary fields',success:true});
+    }
+        const User=await user.findOne({where:{email:email}});
+        if(User){
+            bcrypt.compare(password,User.password,(err,result)=>{
+                if(err){
+                    throw new Error('something went wrong');
+                }if(result===true){
+                    res.status(201).json({message:'User logged in successfully',success:true,token:generateAccessToken(User.id,User.name)})
+                }else{
+                    return res.status(401).json({message:' * User not Authorized',success:false});
+                }
+            });
+        }
+    else{
+            return res.status(404).json({message:' * User not Found',success:false});
+        }
+    }catch(err){
+        res.status(500).json({message:err,success:false});
+}
 }
 
 exports.sync=async()=>{

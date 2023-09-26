@@ -7,8 +7,8 @@ async function senddata(e){
             phone:e.target.phone.value,
             password:e.target.password.value,
         }
+        // const token=localStorage.getItem('token');
         const res=await axios.post('http://localhost:3000/user/signup',data);
-
         const sleep = m => new Promise(r => setTimeout(r, m))
             if(res.status===200){
                 async function emailExist(){
