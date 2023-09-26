@@ -8,7 +8,8 @@ async function login(e){
         const res=await axios.post('http://localhost:3000/user/login',data);
         if(res.status===201){
             localStorage.setItem('token',res.data.token);
-            window.location.href = "http://localhost:3000/groupchatapp";
+            alert('user logged in successfully')
+            window.location.href = "../../views/groupchat.html";
         }
             }catch(err){
                 const message=async (err)=>{

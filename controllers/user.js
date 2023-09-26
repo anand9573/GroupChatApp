@@ -24,7 +24,7 @@ try{
             const saltrounds=10;
             bcrypt.hash(password,saltrounds,async(err,hash)=>{
                 if(hash){
-                    await user.create({name,email,phone,password:hash},{transaction:t});
+                    await user.create({name,email,phone,password:hash,isLogin:false},{transaction:t});
                     await t.commit();
                     return res.status(201).json({message:'you have signed up successfully',success:true})
                 }else{
@@ -42,8 +42,8 @@ try{
     }
 }
 
-function generateAccessToken(id,name){
-    return jwt.sign({userid:id,name},process.env.TOKEN_SECRET)
+function generateAccessToken(id,name,isLogin){
+    return jwt.sign({userid:id,name,isLogin},process.env.TOKEN_SECRET)
 }
 
 exports.login=async(req,res,next)=>{
@@ -54,11 +54,12 @@ exports.login=async(req,res,next)=>{
     }
         const User=await user.findOne({where:{email:email}});
         if(User){
-            bcrypt.compare(password,User.password,(err,result)=>{
+            bcrypt.compare(password,User.password,async(err,result)=>{
                 if(err){
                     throw new Error('something went wrong');
                 }if(result===true){
-                    res.status(201).json({message:'User logged in successfully',success:true,token:generateAccessToken(User.id,User.name)})
+                    await User.update({isLogin:true});
+                    res.status(201).json({message:'User logged in successfully',success:true,token:generateAccessToken(User.id,User.name,User.isLogin)})
                 }else{
                     return res.status(401).json({message:' * User not Authorized',success:false});
                 }

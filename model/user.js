@@ -26,6 +26,7 @@ const User=sequelize.define('user',{
         type:Sequelize.STRING,
         allowNull:false
     },
+    isLogin:Sequelize.BOOLEAN
 });
 
 module.exports=User;
