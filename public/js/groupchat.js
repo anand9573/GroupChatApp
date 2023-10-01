@@ -5,9 +5,6 @@ async function sendmsg(e){
     const res=await axios.post('http://localhost:3000/msgbox/groupchat',messages,{headers:{"Authorization":token}});
     console.log(res.data.messages);
     const msg=document.getElementById('msg');
-    if(msg.innerHTML=''){
-        getusers()
-    }
     const decodeToken=parseJwt(token);
     msg.innerHTML+=`<h6 class="border bg-light">${decodeToken.name} : ${res.data.messages.msg}</h6>`
 }
