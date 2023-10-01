@@ -32,8 +32,19 @@ exports.sendmsg=async(req,res,next)=>{
 exports.usersonline=async(req,res,next)=>{
     try{
     const activeuser=await user.findAll({where:{isLogin:true}});
-    res.status(201).json({users:activeuser,success:false});
+    const msgs=await req.user.getMsgboxes()
+                console.log(msgs)
+    res.status(201).json({users:activeuser,success:false,msgs:msgs});
 }catch(err){
     res.status(500).json({error:err,success:false});
 }
 }
+
+// Model.findAll({
+//     where: {
+//         createdAt: {
+//             $gt: startTime,
+//             $lt: endTime
+//         }
+//     }
+// })
