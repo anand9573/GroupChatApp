@@ -9,4 +9,6 @@ router.post('/groupchat',userAuthentication.authentication,chatController.sendms
 
 router.get('/active-users',userAuthentication.authentication,chatController.usersonline);
 
+router.get('/getmsgs/:lastmsgid',userAuthentication.authentication,chatController.recentmsg);
+
 module.exports=router;

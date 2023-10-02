@@ -6,33 +6,68 @@ async function sendmsg(e){
     console.log(res.data.messages);
     const msg=document.getElementById('msg');
     const decodeToken=parseJwt(token);
-    msg.innerHTML+=`<h6 class="border bg-light">${decodeToken.name} : ${res.data.messages.msg}</h6>`
+    msg.innerHTML+=`<h6 class="border text-success">${decodeToken.name} : ${res.data.messages.msg}</h6>`
 }
 
 async function getusers(){
     const token=localStorage.getItem('token')
     const res=await axios.get('http://localhost:3000/msgbox/active-users',{headers:{"Authorization":token}});
-    const decodeToken=parseJwt(token);
-    const msg=document.getElementById('msg');
-    msg.innerHTML=''
-    res.data.users.forEach((user)=>{
-        msg.innerHTML+=`<h6 class="border text-warning">${user.name} has Joined the chat</h6>`
-    })
-    console.log(res.data)
-    res.data.msgs.forEach((message)=>{
-        msg.innerHTML+=`<h6 class="border text-success">${message.msg}</h6>`
-    })
+    displayMsg(res)
+
 }
+
+async function displayMsg(res){
+    try{
+        const token=localStorage.getItem('token');
+        const decodeToken=parseJwt(token);
+        const msg=document.getElementById('msg');
+        msg.innerHTML=''
+        const users=[]
+        for(const user of res.data.users){
+            users.push({name:user.name,id:user.id})
+        }
+        localStorage.setItem('users',JSON.stringify(users));
+        const useractive=JSON.parse(localStorage.getItem('users'));
+        for(const user of useractive){
+            msg.innerHTML+=`<h6 class="border text-warning">${user.name} has Joined the chat</h6>`
+        }
+        const message=[]
+        for(const obj of res.data.msgs){
+            message.push({name:decodeToken.name,msgs:obj.msg,id:obj.id})
+        }
+        localStorage.setItem('messages',JSON.stringify(message));
+        const messages=JSON.parse(localStorage.getItem('messages'));
+
+    for(const obj of messages){
+        msg.innerHTML+=`<h6 class="border text-success">${decodeToken.name} : ${obj.msgs}</h6>`
+    }
+    }catch(err){
+        console.log(err)
+    }
+}
+
+window.addEventListener('DOMContentLoaded',async()=>{
+    const messages=JSON.parse(localStorage.getItem('messages'));
+    const lastmsgid=messages[messages.length-1].id
+    if(lastmsgid===undefined){
+        lastmsgid=-1
+    }
+    const token=localStorage.getItem('token');
+    const res=await axios.get(`http://localhost:3000/msgbox/getmsgs/${lastmsgid}`,{headers:{"Authorization":token}});
+    displayMsg(res);
+})
+
 const update=async()=>{
     try{
-        setInterval(function getmsgs() {
-            getusers()
-        }, 9000);
+        const interval=setInterval(function getmsgs() {
+            getusers();
+        }, 3000);
+        // clearInterval(interval)
     }catch(err){
             console.log(err)
     } 
 }
-update()
+// update()
 
 function parseJwt (token) {
     var base64Url = token.split('.')[1];

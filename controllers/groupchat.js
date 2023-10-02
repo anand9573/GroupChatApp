@@ -1,3 +1,4 @@
+const Sequelize=require('sequelize')
 const sequelize=require('../util/database');
 const user=require('../model/user');
 const groupchat=require('../model/groupchat');
@@ -33,18 +34,20 @@ exports.usersonline=async(req,res,next)=>{
     try{
     const activeuser=await user.findAll({where:{isLogin:true}});
     const msgs=await req.user.getMsgboxes()
-                console.log(msgs)
     res.status(201).json({users:activeuser,success:false,msgs:msgs});
 }catch(err){
     res.status(500).json({error:err,success:false});
 }
 }
 
-// Model.findAll({
-//     where: {
-//         createdAt: {
-//             $gt: startTime,
-//             $lt: endTime
-//         }
-//     }
-// })
+exports.recentmsg=async(req,res,next)=>{
+    try{
+        const lastmsgid=req.params.lastmsgid;
+        const activeuser=await user.findAll({where:{isLogin:true}});
+        const msgs=await req.user.getMsgboxes({where:{id:{[Sequelize.Op.gt]: lastmsgid-10}}});
+        res.status(201).json({users:activeuser,success:false,msgs:msgs});
+    }catch(err){
+        res.status(500).json({error:err,success:false});
+    }
+
+}
