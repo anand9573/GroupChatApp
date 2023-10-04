@@ -18,7 +18,7 @@ exports.sendmsg=async(req,res,next)=>{
         if(isInValid(msg)){
             return res.status(400).json({message:'Missing parameters !',success:false});
         }
-        const data=await req.user.createMsgbox({msg:msg,status:'Sent'},{transaction:t});
+        const data=await req.user.createMsgbox({msg:msg,status:'Sent',sentBy:req.user.dataValues.name},{transaction:t});
         await t.commit();
         res.status(201).json({messages:data,success:true})
 

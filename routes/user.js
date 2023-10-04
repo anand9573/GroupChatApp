@@ -9,4 +9,8 @@ router.post('/signup',userControllers.signup)
 
 router.post('/login',userControllers.login)
 
+router.post('/groups',middleware.authentication,userControllers.creategroup)
+
+router.get('/groups/:groupname',middleware.authentication,userControllers.groupmsg)
+
 module.exports=router;

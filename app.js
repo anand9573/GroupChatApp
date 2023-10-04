@@ -10,6 +10,7 @@ const groupchatRoutes=require('./routes/groupchat')
 const userControllers=require('./controllers/user');
 const User = require('./model/user');
 const Groupchat=require('./model/groupchat');
+const Groups=require('./model/groups');
 
 app.use(cors({
     origin:'http://127.0.0.1:5500', //* for all
@@ -20,8 +21,14 @@ app.use(express.json())
 app.use('/user',userRoutes)
 app.use('/msgbox',groupchatRoutes)
 
+User.hasMany(Groups, { foreignKey: 'userId' });
+Groups.belongsToMany(User, { through: 'usergroups' }); 
+
 User.hasMany(Groupchat);
 Groupchat.belongsTo(User);
+
+Groups.hasMany(Groupchat,{foreignKey:'groupId'});
+Groupchat.belongsTo(Groups);
 
 userControllers.sync()
 app.listen(3000)

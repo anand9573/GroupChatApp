@@ -9,7 +9,8 @@ const Groupchat=sequelize.define('msgbox',{
         allowNull:false
     },
    msg:Sequelize.STRING,
-   status:Sequelize.STRING
+   status:Sequelize.STRING,
+   sentBy:Sequelize.STRING
 });
 
 module.exports=Groupchat;

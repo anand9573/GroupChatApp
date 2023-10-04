@@ -2,12 +2,43 @@ const sequelize=require('../util/database');
 const user=require('../model/user');
 const bcrypt=require('bcrypt');
 const jwt=require('jsonwebtoken');
+const group=require('../model/groups')
 
 function isinvalid(string){
     if(string===undefined || string.length===0){
         return true
     }
     return false
+}
+
+exports.groupmsg=async(req,res,next)=>{
+    try{
+        const {groupname}=req.params
+        const group=await req.user.findOne({where:{groupName:groupname}});
+        res.status(201).json({group:group,status:'active',message:'chat exist',success:true});
+    }catch(err){
+        res.status(500).json({message:'Not authorized or group not exist',success:false})
+    }
+}
+
+exports.creategroup=async(req,res,next)=>{
+    let t=await sequelize.transaction();
+    try{
+        const {groupname}=req.body;
+        if(isinvalid(groupname)){
+            res.status(403).json({message:`group name can't be empty`,success:true});
+        }else{
+                await req.user.createGroup({groupName:groupname,createdBy:req.user.dataValues.name},{transaction:t});
+                await t.commit();
+                const groups=await req.user.getGroups();
+            res.status(201).json({message:'group created successfully',groups:groups,success:true})
+        }
+    }catch(err){
+        if(t){
+            await t.rollback()
+        }
+        res.status(500).json({message:'group name already exist please select another name',success:false})
+    }
 }
 
 exports.signup=async(req,res,next)=>{
